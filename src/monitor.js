@@ -1,7 +1,7 @@
 const os = require('node:os')
 const colors = require("fluent-interface-colors")
 
-function systemMonitor() {
+function systemMonitor(interval = 1000) {
   const colorizePercentage = (percentage) => {
     if(percentage < 25) return colors.bggreen.format(percentage+"%")
     if(percentage < 75) return colors.bgyellow.format(percentage+"%")
@@ -55,6 +55,7 @@ function systemMonitor() {
       initialTimes = currentTimes
     }, interval)
   }
+
   const memory = (interval) => {
     const totalRam = Math.round(100*(os.totalmem()/1073741824))/100
 
@@ -66,12 +67,40 @@ function systemMonitor() {
     }, interval);
   }
 
-  const monitor = (interval) => {
-    
+  const memoryMonitor = (totalRam) => {
+    const [freeRam, percentageFree] = calculateRAMUsage(totalRam)
+    colors.bold.log(`Free RAM: ${percentageFree}, ${freeRam}/${totalRam} GB`)
   }
 
-  return () => {
-    memory(1000)
+  const cpuMonitor = (cpuTimes, oldCpuTimes) => {
+    const previousTimes = oldCpuTimes
+    const currentTimes = cpuTimes
+
+    let count = 1
+    previousTimes.map((cpu, index) => {
+      const usage = caluclateCPUUsage(previousTimes[index], currentTimes[index])
+      colors.bold.log(`CPU${count}: `, usage)
+      count+=1
+    })
+  }
+
+  const monitor = (interval) => {
+    const totalRam = Math.round(100*(os.totalmem()/1073741824))/100
+    let oldCpuTimes = os.cpus().map((cpu) => cpu.times)
+
+    const monitorInterval = setInterval(() => {
+      let cpuTimes = os.cpus().map((cpu) => cpu.times)
+
+      process.stdout.write('\x1b[2J\x1b[1;1H')
+      cpuMonitor(cpuTimes, oldCpuTimes)
+      memoryMonitor(totalRam)
+    }, interval);
+  }
+
+  return {
+    cpus: () => cpus(interval),
+    memory: () => memory(interval),
+    all: () => monitor(interval)
     }
 }
 

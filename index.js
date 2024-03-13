@@ -1,3 +1,3 @@
 const monitor = require("./src/monitor.js")
 
-monitor()
+monitor.all()
