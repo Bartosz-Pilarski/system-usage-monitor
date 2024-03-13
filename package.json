@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Bartosz-Pilarski/system-usage-monitor/issues"
   },
-  "homepage": "https://github.com/Bartosz-Pilarski/system-usage-monitor#readme"
+  "homepage": "https://github.com/Bartosz-Pilarski/system-usage-monitor#readme",
+  "dependencies": {
+    "fluent-interface-colors": "^3.0.2"
+  }
 }
