@@ -1,6 +1,6 @@
 {
   "name": "system-usage-monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple system resources usage monitor for Node.js",
   "main": "index.js",
   "bin": {
