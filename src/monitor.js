@@ -4,7 +4,7 @@ const colors = require("fluent-interface-colors")
 function systemMonitor() {
   const colorizePercentage = (percentage) => {
     if(percentage < 25) return colors.bggreen.format(percentage+"%")
-    if(percentage < 60) return colors.bgyellow.format(percentage+"%")
+    if(percentage < 75) return colors.bgyellow.format(percentage+"%")
     return colors.bgred.format(percentage+"%")
   }
 
@@ -22,12 +22,21 @@ function systemMonitor() {
     }
 
     const total = timesDeltas.user + timesDeltas.nice + timesDeltas.sys + timesDeltas.idle + timesDeltas.irq
-    const percentageUsed = Math.round(100-(timesDeltas.idle/total)*100)
+    const percentageFree = Math.round(100-(timesDeltas.idle/total)*100)
 
-    return colorizePercentage(percentageUsed)
+    return colorizePercentage(percentageFree)
+  }
+  /*
+    Convert free RAM to from bytes to GBs and calculate % of free memory. 
+    Returns both GBs of free RAM and the percentage
+  */
+  const calculateRAMUsage = (totalMem) => {
+    const freeRam = Math.round(100*(os.freemem()/1073741824))/100
+    const percentageUsed = Math.round(100*(freeRam/totalMem))
+    return [freeRam, colorizePercentage(percentageUsed)]
   }
 
-  const cpus = (mode) => {
+  const cpus = (interval) => {
     let initialTimes = os.cpus().map((cpu) => cpu.times)
 
     return setInterval(() => {
@@ -44,12 +53,25 @@ function systemMonitor() {
       })
 
       initialTimes = currentTimes
-    }, 1000)
+    }, interval)
+  }
+  const memory = (interval) => {
+    const totalRam = Math.round(100*(os.totalmem()/1073741824))/100
+
+    return setInterval(() => {
+      //Clear terminal window
+      process.stdout.write('\x1b[2J\x1b[1;1H')
+      const [freeRam, percentageFree] = calculateRAMUsage(totalRam)
+      colors.bold.log(`Free RAM: ${percentageFree}, ${freeRam}/${totalRam} GB`)
+    }, interval);
   }
 
+  const monitor = (interval) => {
+    
+  }
 
   return () => {
-      cpus()
+    memory(1000)
     }
 }
 
