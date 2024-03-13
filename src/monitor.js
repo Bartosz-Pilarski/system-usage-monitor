@@ -97,7 +97,7 @@ function systemMonitor() {
     setInterval(() => {
       let cpuTimes = os.cpus().map((cpu) => cpu.times)
 
-      process.stdout.write('\x1b[2J\x1b[1;1H')
+      process.stdout.write('\x1b[2J\x1b[H')
       colors.bold.bgmagenta.log("!--   CPU   --!")
       cpuMonitor(cpuTimes, oldCpuTimes)
       colors.bold.bgmagenta.log("!-- MEMORY  --!")
