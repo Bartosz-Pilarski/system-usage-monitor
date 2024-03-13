@@ -1,1 +1,3 @@
-console.log("ahoy")
+const monitor = require("./src/monitor.js")
+
+monitor()
